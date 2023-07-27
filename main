@@ -1,0 +1,22 @@
+# Define the registry path to the Device Guard settings
+$registryPath = "HKLM:\Software\Policies\Microsoft\Windows\DeviceGuard"
+
+# Check if the registry key exists; if not, create it
+if (-Not (Test-Path $registryPath)) {
+    New-Item -Path $registryPath -Force | Out-Null
+}
+
+# Disable Device Guard by setting the values to 0 (zero)
+$deviceGuardSettings = @{
+    "EnableVirtualizationBasedSecurity" = 0
+    "RequirePlatformSecurityFeatures"   = 0
+    "HypervisorEnforcedCodeIntegrity"   = 0
+}
+
+$deviceGuardSettings.GetEnumerator() | ForEach-Object {
+    Set-ItemProperty -Path $registryPath -Name $_.Key -Value $_.Value
+}
+
+# Output a message indicating the changes
+Write-Host "Device Guard has been disabled."
+
